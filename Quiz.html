@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ultimate Student Quiz Challenge</title>
+<style>
+:root{--bg1:#eef2ff;--bg2:#fdf2f8;--card:#fff;--tx:#1e1b4b;--mu:#6b7280;--pr:#6366f1;--ok:#16a34a;--bad:#dc2626;--bd:#e5e7eb}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tx);min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));background-attachment:fixed}
+#app{max-width:760px;margin:0 auto;padding:20px 16px 40px}
+.scr{animation:in .45s ease both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h1{font-size:1.9rem;text-align:center;margin:18px 0 4px}
+.sub{text-align:center;color:var(--mu);margin-bottom:20px}
+.card{background:var(--card);border-radius:18px;padding:20px;box-shadow:0 6px 24px rgba(99,102,241,.1)}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:12px;font-size:1rem;margin-top:10px;transition:.2s;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 4px rgba(99,102,241,.15)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+.cat{background:var(--card);border:2px solid transparent;border-radius:16px;padding:18px;text-align:left;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.05);transition:.25s;animation:in .5s ease both;font-size:1rem;color:var(--tx)}
+.cat:hover{transform:translateY(-4px);border-color:var(--pr);box-shadow:0 10px 24px rgba(99,102,241,.2)}
+.cat .ic{font-size:2rem}.cat b{display:block;margin-top:6px}.cat small{color:var(--mu)}
+.btn{background:var(--pr);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:1rem;cursor:pointer;transition:.2s;margin-top:14px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(99,102,241,.35)}
+.btn.g{background:#eef2ff;color:var(--pr)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.timer{font-weight:700;background:#fff;padding:8px 14px;border-radius:99px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad);animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.bar{height:8px;background:#e0e7ff;border-radius:9px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#ec4899);width:0;transition:width .5s ease}
+.q{font-size:1.2rem;font-weight:600;margin-bottom:14px;line-height:1.4}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid var(--bd);border-radius:14px;padding:13px 14px;margin-top:10px;font-size:1rem;cursor:pointer;color:var(--tx);transition:.2s;animation:in .4s ease both}
+.opt:hover:not(.lock){border-color:var(--pr);transform:translateX(4px);background:#f5f3ff}
+.opt b{width:30px;height:30px;border-radius:50%;background:#eef2ff;color:var(--pr);display:grid;place-items:center;flex:none;font-size:.9rem}
+.opt.ok{border-color:var(--ok);background:#f0fdf4;animation:pop .5s ease}
+.opt.ok b{background:var(--ok);color:#fff}.opt.ok::after{content:"✓";margin-left:auto;color:var(--ok);font-weight:800;font-size:1.3rem}
+.opt.bad{border-color:var(--bad);background:#fef2f2;animation:shake .5s ease}
+.opt.bad b{background:var(--bad);color:#fff}.opt.bad::after{content:"✕";margin-left:auto;color:var(--bad);font-weight:800;font-size:1.3rem}
+.opt.lock{cursor:default}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04);box-shadow:0 0 0 8px rgba(22,163,74,.2)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.fb{margin-top:14px;font-weight:600;min-height:24px;animation:in .3s ease}
+.res{text-align:center}
+.ring{width:150px;height:150px;border-radius:50%;margin:10px auto;display:grid;place-items:center;font-size:2rem;font-weight:800;background:conic-gradient(var(--c) calc(var(--p)*1%),#e5e7eb 0);transition:--p 1s}
+.ring span{background:#fff;width:116px;height:116px;border-radius:50%;display:grid;place-items:center}
+.badge{display:inline-block;padding:6px 18px;border-radius:99px;font-weight:700;color:#fff;animation:pop .6s ease}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media(max-width:560px){.cols{grid-template-columns:1fr}}
+.col h3{padding:10px 14px;border-radius:12px 12px 0 0;color:#fff}
+.col.p h3{background:var(--ok)}.col.f h3{background:var(--bad)}
+.row{background:#fff;padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;gap:8px;animation:in .4s ease both}
+.row small{color:var(--mu);display:block}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.stat{flex:1;min-width:90px;background:#fff;border-radius:14px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.stat b{font-size:1.5rem;display:block}
+.foot{text-align:center;margin-top:24px}.foot a{color:var(--mu);font-size:.85rem;cursor:pointer;text-decoration:underline}
+.cat.done{opacity:.65;cursor:default}.cat.done:hover{transform:none;border-color:transparent;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.row{cursor:pointer}.det{display:none;background:#f9fafb;padding:10px 14px;font-size:.85rem;border-bottom:1px solid var(--bd)}
+.rw.open .det{display:block;animation:in .3s ease}.det h4{margin:10px 0 4px}.det div{padding:2px 0}
+.tabs{display:flex;gap:8px;margin-top:10px}.tabs .btn{margin:0;flex:1;padding:10px}
+.err{color:var(--bad);margin-top:8px;font-size:.9rem}
+</style></head>
+<body><div id="app"></div>
+<script>
+const URL_API="https://script.google.com/macros/s/AKfycbwItlBUbKgam7VNu-g-GS62q3-IloyWzwz867UPbz0x-Uq2iFBHeSSmYjGcX20DiqQn/exec";
+const PASS=50, ADMIN_PW="admin84";
+const CATS=[
+{n:"Maths",ic:"➗",m:15,a:[1,2,0,2,2,1,1,2,2,2,1,1,2,1,1,1,1,2,1,2],q:[
+"What is 25 + 17?|40|42|43|45","What is 9 × 6?|45|52|54|56","What is 100 − 38?|62|68|72|58","What is 144 ÷ 12?|10|11|12|14","What is half of 80?|30|35|40|45","How many sides does a hexagon have?|5|6|7|8","What is 10% of 200?|10|20|30|40","What is 3/4 of 20?|10|12|15|18","What is 15 + 15 + 15?|35|40|45|50","How many minutes are in 2 hours?|60|100|120|180","What is the place value of 5 in 352?|5|50|500|52","Which is the smallest number?|0.5|0.25|0.75|1","What is 7 squared (7 × 7)?|14|42|49|56","How many centimetres are in 1 metre?|10|100|1000|50","What is 1/2 + 1/2?|1/2|1|2|1/4","What is 80 ÷ 8?|8|10|12|16","A triangle has how many sides?|2|3|4|5","What is 5 × 12?|50|55|60|65","What is the next number: 5, 10, 15, 20, __?|22|25|30|35","How many days are there in one week?|5|6|7|8"]},
+{n:"Science",ic:"🔬",m:10,a:[1,2,0,1,1,2,0,1,2,1,1,2,0,1,2,2,2,1,3,0],q:[
+"Which planet is called the Red Planet?|Earth|Mars|Venus|Saturn","Which organ pumps blood in the human body?|Lungs|Brain|Heart|Stomach","Which gas do humans need to breathe?|Oxygen|Carbon dioxide|Helium|Hydrogen","What is the main source of Earth's light?|Moon|Sun|Stars only|Fire","How many legs does a spider have?|6|8|10|12","Which part of a plant absorbs water?|Flower|Leaves|Roots|Fruit","At what temperature does water freeze in Celsius?|0°C|10°C|50°C|100°C","Which animal is known as the king of the jungle?|Tiger|Lion|Elephant|Bear","Which sense organ helps us to see?|Ears|Nose|Eyes|Skin","What do bees collect from flowers?|Sand|Nectar|Leaves|Stones","Which planet do we live on?|Mars|Earth|Jupiter|Mercury","Which of these is a mammal?|Frog|Shark|Dolphin|Crocodile","What do plants need to make food?|Sunlight|Plastic|Smoke|Sand only","Which part of the body helps us think?|Heart|Brain|Liver|Lungs","Which of these is a source of renewable energy?|Coal|Petrol|Solar energy|Diesel","What is the boiling point of water at sea level?|50°C|75°C|100°C|150°C","Which star is closest to Earth?|Sirius|Polaris|The Sun|Vega","What do we call animals that eat only plants?|Carnivores|Herbivores|Omnivores|Insects","Which vitamin can our body make with sunlight?|Vitamin A|Vitamin B12|Vitamin C|Vitamin D","Which state of matter has a fixed shape?|Solid|Liquid|Gas|Vapour"]},
+{n:"English",ic:"📚",m:10,a:[1,2,1,2,1,2,1,2,1,1,2,1,2,0,2,2,2,0,0,1],q:[
+"What is the plural of 'child'?|Childs|Children|Childes|Childrens","Choose the correct spelling.|Beautifull|Beutiful|Beautiful|Butiful","What is the opposite of 'hot'?|Warm|Cold|Dry|Bright","Which word is a noun?|Run|Quickly|Teacher|Beautiful","Choose the correct sentence.|She go to school.|She goes to school.|She going school.|She gone school.","What is the past tense of 'go'?|Goed|Gone|Went|Going","Which word is an adjective?|Happiness|Beautiful|Run|Slowly","What is the synonym of 'happy'?|Sad|Angry|Joyful|Tired","Choose the correct article: ___ apple.|A|An|Thee|No article","What is the opposite of 'early'?|Fast|Late|Soon|Quick","Which punctuation mark ends a question?|Full stop|Comma|Question mark|Colon","What is the plural of 'book'?|Bookes|Books|Bookies|Book's","Choose the correct pronoun: Ali is a boy. ___ is kind.|She|It|He|They","Which word is a verb?|Jump|Blue|Table|Soft","What is the comparative form of 'tall'?|Tallest|More tall|Taller|Talling","Complete: They ___ playing.|Is|Am|Are|Was","Which is a vowel?|B|C|E|G","What is the opposite of 'empty'?|Full|Small|Open|Light","Choose the correct spelling.|School|Skool|Scholl|Scool","What is the past tense of 'eat'?|Eated|Ate|Eating|Eatened"]},
+{n:"General Knowledge",ic:"🌍",m:10,a:[2,2,3,2,1,2,1,2,2,1,1,2,2,1,0,2,1,1,1,2],q:[
+"What is the capital of Pakistan?|Karachi|Lahore|Islamabad|Peshawar","How many days are there in a leap year?|364|365|366|367","Which is the largest ocean in the world?|Indian|Atlantic|Arctic|Pacific","How many colours are there in a rainbow traditionally?|5|6|7|8","Which country is famous for the Eiffel Tower?|Italy|France|Spain|Germany","What is the national language of Pakistan?|Punjabi|Sindhi|Urdu|Pashto","Which is the largest continent?|Africa|Asia|Europe|Australia","How many months are there in a year?|10|11|12|13","Which animal is the tallest in the world?|Elephant|Camel|Giraffe|Horse","What is the currency of Japan?|Yuan|Yen|Won|Rupee","Which day comes after Friday?|Thursday|Saturday|Sunday|Monday","Which is the nearest natural satellite of Earth?|Sun|Mars|Moon|Venus","How many players are on the field for one football team at the start of a standard match?|9|10|11|12","Which instrument is used to measure temperature?|Barometer|Thermometer|Ruler|Compass","Which country is known for the pyramids of Giza?|Egypt|Greece|China|Mexico","How many hours are there in one day?|12|18|24|48","Which is the largest land animal?|Lion|African elephant|Giraffe|Rhinoceros","Which festival marks the end of Ramadan?|Eid ul-Adha|Eid ul-Fitr|Nowruz|Diwali","What is the capital of Türkiye?|Istanbul|Ankara|Izmir|Antalya","Which direction does the Sun generally rise from?|North|South|East|West"]},
+{n:"Computer & AI",ic:"🤖",m:10,a:[0,1,1,0,0,2,0,1,0,0,1,0,0,2,0,0,2,0,2,1],q:[
+"What does CPU stand for?|Central Processing Unit|Computer Personal Unit|Central Program Utility|Control Power Unit","Which device is used to type text?|Monitor|Keyboard|Speaker|Printer","What does AI stand for?|Automated Internet|Artificial Intelligence|Advanced Input|Applied Information","Which of these is a web browser?|Google Chrome|Microsoft Word|Calculator|Paint","What is the full form of WWW?|World Wide Web|World Web Window|Wide World Work|Web World Wide","Which device displays computer output?|Mouse|Keyboard|Monitor|Microphone","Which of these is used to store files?|USB flash drive|Speaker|Webcam|Microphone","What is a password used for?|Decorating a screen|Protecting an account|Increasing volume|Printing documents","Which one is an AI chatbot?|ChatGPT|Calculator|Notepad|File Explorer","What does email allow us to do?|Send electronic messages|Wash clothes|Print money|Repair screens","Which key usually starts a new line while typing?|Shift|Enter|Esc|Caps Lock","What does URL refer to?|A web address|A computer virus|A keyboard key|A type of printer","Which of these is an operating system?|Windows|Google Search|YouTube|Gmail","What should you do with a suspicious email link?|Click it quickly|Share your password|Avoid clicking and verify it|Forward it to everyone","Which tool is commonly used to create presentations?|PowerPoint|Calculator|Camera|Recycle Bin","What is cloud storage?|Saving files online|A type of weather|A computer fan|A keyboard layout","Which of these is an input device?|Monitor|Printer|Mouse|Projector","What is the purpose of a search engine?|Find information online|Charge a laptop|Edit hardware|Clean a keyboard","What is a strong password usually like?|123456|Your first name only|A mix of letters, numbers and symbols|The word password","What should you do before sharing AI-generated information?|Assume it is always true|Verify important facts|Never read it|Delete all sources"]}
+];
+const L="ABCD", app=document.getElementById("app");
+let S={}, tm=null;
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+function view(h){app.innerHTML='<div class="scr">'+h+'</div>'}
+
+let ST=null;
+try{ST=JSON.parse(sessionStorage.getItem("st"))}catch(e){}
+const save=()=>{try{sessionStorage.setItem("st",JSON.stringify(ST))}catch(e){}};
+function login(err){
+ view(`<h1>🏆 Ultimate Student Quiz Challenge</h1><p class="sub">Apna naam aur roll number sirf ek dafa likhen</p>
+ <div class="card"><input id="nm" placeholder="Student Name"><input id="rl" placeholder="Roll No" onkeydown="if(event.key==='Enter')enter()">
+ <div class="err">${err||""}</div><button class="btn" onclick="enter()">Continue →</button></div>
+ <div class="foot"><a onclick="adminLogin()">Admin Dashboard</a></div>`);
+}
+function enter(){
+ const n=document.getElementById("nm").value.trim(), r=document.getElementById("rl").value.trim();
+ if(!n||!r) return login("Naam aur roll number dono likhen.");
+ ST={name:n,roll:r,done:{}}; save(); home();
+}
+function logout(){ST=null;save();home()}
+function home(){
+ clearInterval(tm);
+ if(!ST) return login();
+ view(`<h1>🏆 Ultimate Student Quiz Challenge</h1><p class="sub">Welcome, <b>${esc(ST.name)}</b> (Roll No: ${esc(ST.roll)})<br>Category chunen</p>
+ <div class="grid">${CATS.map((c,i)=>{const d=ST.done[c.n],ok=d!==undefined;return `<button class="cat${ok?" done":""}" style="animation-delay:${i*70}ms" ${ok?"disabled":`onclick="start(${i})"`}><span class="ic">${c.ic}</span><b>${c.n}</b><small>${ok?"✓ Completed · "+d+"/20":"20 MCQs · "+c.m+" minutes"}</small></button>`}).join("")}</div>
+ <div class="foot"><a onclick="logout()">Change student</a> · <a onclick="adminLogin()">Admin Dashboard</a></div>`);
+}
+function start(i){
+ const c=CATS[i];
+ S={name:ST.name,roll:ST.roll,ci:i,idx:0,ans:Array(20).fill(null),locked:false,t0:Date.now(),end:Date.now()+c.m*60000};
+ clearInterval(tm); tm=setInterval(tick,250); render();
+}
+function tick(){
+ const left=Math.max(0,Math.ceil((S.end-Date.now())/1000)), el=document.getElementById("tm");
+ if(el){el.textContent="⏱ "+fmt(left);el.classList.toggle("low",left<=60)}
+ if(left<=0) finish(true);
+}
+function render(){
+ const c=CATS[S.ci], p=c.q[S.idx].split("|"), left=Math.max(0,Math.ceil((S.end-Date.now())/1000));
+ S.locked=false;
+ view(`<div class="top"><b>${c.ic} ${c.n}</b><span class="timer" id="tm">⏱ ${fmt(left)}</span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <div class="card"><small style="color:var(--mu)">Question ${S.idx+1} / 20</small>
+ <div class="q">${esc(p[0])}</div>
+ ${p.slice(1).map((o,i)=>`<button class="opt" style="animation-delay:${i*60}ms" onclick="pick(${i})"><b>${L[i]}</b>${esc(o)}</button>`).join("")}
+ <div class="fb" id="fb"></div><div id="nx"></div></div>`);
+ requestAnimationFrame(()=>{document.getElementById("pb").style.width=(S.idx/20*100)+"%"});
+}
+function pick(i){
+ if(S.locked) return; S.locked=true; S.ans[S.idx]=i;
+ const c=CATS[S.ci], cor=c.a[S.idx], opts=document.querySelectorAll(".opt"), fb=document.getElementById("fb");
+ opts.forEach(o=>o.classList.add("lock"));
+ opts[cor].classList.add("ok");
+ if(i===cor){fb.style.color="var(--ok)";fb.textContent="🎉 Bilkul sahi!"}
+ else{opts[i].classList.add("bad");fb.style.color="var(--bad)";fb.textContent="Ghalat jawab — sahi jawab: "+L[cor]}
+ document.getElementById("pb").style.width=((S.idx+1)/20*100)+"%";
+ document.getElementById("nx").innerHTML=`<button class="btn" onclick="next()">${S.idx<19?"Next →":"Finish ✓"}</button>`;
+}
+function next(){ if(S.idx<19){S.idx++;render()} else finish(false) }
+
+function finish(auto){
+ clearInterval(tm);
+ const c=CATS[S.ci], cq=[],wq=[],all=[]; let score=0;
+ c.q.forEach((q,i)=>{
+  const p=q.split("|"), a=S.ans[i], cor=c.a[i], t=(i+1)+". "+p[0];
+  all.push((i+1)+": "+(a===null?"Not attempted":L[a]+" ("+p[a+1]+")")+" | Correct: "+L[cor]+" ("+p[cor+1]+")");
+  if(a===cor){score++;cq.push(t)}else wq.push(t);
+ });
+ const pct=Math.round(score/20*100), pass=pct>=PASS, taken=Math.min(Math.round((Date.now()-S.t0)/1000),c.m*60);
+ S.payload={name:S.name,rollNo:S.roll,category:c.n,total:20,score,correctQuestions:cq,wrongQuestions:wq,answers:all,timeTaken:Math.floor(taken/60)+"m "+(taken%60)+"s"};
+ ST.done[c.n]=score;save();
+ const col=pass?"var(--ok)":"var(--bad)";
+ view(`<div class="card res"><h1>${auto?"⏰ Time Up!":"Quiz Complete!"}</h1><p class="sub">${esc(S.name)} · ${c.n}</p>
+ <div class="ring" id="rg" style="--c:${col};--p:0"><span>${score}/20</span></div>
+ <p style="margin:8px 0"><span class="badge" style="background:${col}">${pass?"PASS 🎉":"FAIL"}</span></p>
+ <p>Percentage: <b>${pct}%</b> · Correct: <b>${score}</b> · Wrong: <b>${20-score}</b></p>
+ <p id="sv" style="margin-top:10px;color:var(--mu)">Result Google Sheet mein save ho raha hai…</p>
+ <button class="btn" onclick="home()">Next Category →</button></div>`);
+ let v=0; const iv=setInterval(()=>{v+=2;const r=document.getElementById("rg");if(!r||v>=pct){clearInterval(iv);if(r)r.style.setProperty("--p",pct);return}r.style.setProperty("--p",v)},20);
+ send();
+}
+async function send(){
+ const sv=()=>document.getElementById("sv");
+ try{
+  await fetch(URL_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(S.payload)});
+  if(sv()){sv().style.color="var(--ok)";sv().textContent="✅ Result save ho gaya."}
+ }catch(e){
+  if(sv()){sv().style.color="var(--bad)";sv().innerHTML='❌ Save nahi hua. Internet check karen. <a style="color:var(--pr);cursor:pointer;text-decoration:underline" onclick="send()">Dobara try karen</a>'}
+ }
+}
+
+function adminLogin(err){
+ view(`<h1>🔐 Admin Login</h1><div class="card"><input id="pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')adminGo()">
+ <div class="err">${err||""}</div><button class="btn" onclick="adminGo()">Login</button> <button class="btn g" onclick="home()">Back</button></div>`);
+}
+function adminGo(){ document.getElementById("pw").value===ADMIN_PW?dash():adminLogin("Password ghalat hai.") }
+function jsonp(){return new Promise((res,rej)=>{
+ const cb="cb"+Date.now(), s=document.createElement("script");
+ const done=()=>{clearTimeout(t);delete window[cb];s.remove()};
+ const t=setTimeout(()=>{done();rej(new Error("timeout"))},15000);
+ window[cb]=d=>{done();res(d)};
+ s.onerror=()=>{done();rej(new Error("load"))};
+ s.src=URL_API+"?callback="+cb+"&t="+Date.now();
+ document.head.appendChild(s);
+})}
+async function dash(){
+ view('<p class="sub">Loading data…</p>');
+ try{
+  let j;
+  try{ j=await (await fetch(URL_API+"?t="+Date.now())).json(); }catch(e1){ j=await jsonp(); }
+  if(!j||!j.data) throw new Error("no data");
+  const pj=v=>{try{const a=JSON.parse(v);return Array.isArray(a)?a:[]}catch(e){return []}};
+  const norm=c=>{const k=String(c||"").trim().toLowerCase();const m=CATS.find(x=>x.n.toLowerCase()===k||k.startsWith(x.n.toLowerCase().slice(0,4)));return m?m.n:String(c||"").trim()};
+  S.rows=j.data.map(d=>Object.values(d)).filter(v=>v[1]).map(v=>{const t=Number(v[4])||20,s=Number(v[5])||0;return{name:String(v[1]).trim(),roll:String(v[2]).trim(),cat:norm(v[3]),s,t,pct:Math.round(s/t*100),time:v[11]||"",when:v[0],cq:pj(v[8]),wq:pj(v[9]),an:pj(v[10])}});
+  S.view="att"; S.f="All"; drawDash();
+ }catch(e){
+  view('<div class="card"><p class="err">Data load nahi hua. Apps Script deployment ("Anyone" access) check karen.</p><button class="btn" onclick="dash()">Retry</button> <button class="btn g" onclick="home()">Back</button></div>');
+ }
+}
+function setV(v,f){ if(v)S.view=v; if(f)S.f=f; drawDash() }
+const list=(a)=>a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"<div>—</div>";
+const detA=r=>`<div class="det"><small>${esc(r.cat)} · Time: ${esc(r.time)}${r.when?" · "+esc(new Date(r.when).toLocaleString()):""}</small>
+ <h4 style="color:var(--ok)">✅ Correct Questions (${r.cq.length})</h4>${list(r.cq)}
+ <h4 style="color:var(--bad)">❌ Wrong Questions (${r.wq.length})</h4>${list(r.wq)}
+ <h4>📝 All Attempted Answers</h4>${list(r.an)}</div>`;
+function drawDash(){
+ const v=S.view, f=S.f; let items;
+ if(v==="att") items=S.rows.filter(r=>f==="All"||r.cat===f).map(r=>({...r,det:detA(r),sub:"Roll: "+r.roll+" · "+r.cat}));
+ else{
+  const g={};
+  S.rows.forEach(r=>{const k=r.roll+"|"+r.name;(g[k]=g[k]||{name:r.name,roll:r.roll,s:0,t:0,rs:[]});g[k].s+=r.s;g[k].t+=r.t;g[k].rs.push(r)});
+  items=Object.values(g).map(x=>({...x,pct:Math.round(x.s/x.t*100),sub:"Roll: "+x.roll+" · "+x.rs.length+" categories",
+   det:`<div class="det">${x.rs.map(r=>`<div><b>${esc(r.cat)}</b>: ${r.s}/${r.t} (${r.pct}%) — ${r.pct>=PASS?"Pass":"Fail"}</div>`).join("")}</div>`}));
+ }
+ items.sort((a,b)=>b.s-a.s||a.name.localeCompare(b.name));
+ const P=items.filter(r=>r.pct>=PASS), F=items.filter(r=>r.pct<PASS);
+ const li=a=>a.length?a.map((r,i)=>`<div class="rw"><div class="row" style="animation-delay:${i*40}ms" onclick="this.parentNode.classList.toggle('open')"><div><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></div><div style="text-align:right"><b>${r.s}/${r.t}</b><small>${r.pct}%</small></div></div>${r.det}</div>`).join(""):'<div class="row"><small>Koi student nahi</small></div>';
+ view(`<div class="top"><h1 style="margin:0;font-size:1.5rem">📊 Admin Dashboard</h1><div><button class="btn g" style="margin:0" onclick="dash()">↻</button> <button class="btn g" style="margin:0" onclick="home()">Exit</button></div></div>
+ <div class="tabs"><button class="btn ${v==="att"?"":"g"}" onclick="setV('att')">Category-wise Attempts</button><button class="btn ${v==="all"?"":"g"}" onclick="setV('all')">Student-wise Overall</button></div>
+ ${v==="att"?`<select onchange="setV(null,this.value)"><option>All</option>${CATS.map(c=>`<option ${c.n===f?"selected":""}>${c.n}</option>`).join("")}</select>`:""}
+ <div class="stats"><div class="stat"><b>${items.length}</b>${v==="att"?"Attempts":"Students"}</div><div class="stat"><b style="color:var(--ok)">${P.length}</b>Pass</div><div class="stat"><b style="color:var(--bad)">${F.length}</b>Fail</div></div>
+ <div class="cols"><div class="col p"><h3>✅ Pass (${P.length})</h3>${li(P)}</div><div class="col f"><h3>❌ Fail (${F.length})</h3>${li(F)}</div></div>
+ <p class="sub" style="margin-top:14px">Pass criteria: ${PASS}% · Marks ke hisab se (zyada → kam) · Detail ke liye kisi naam par click karen</p>`);
+}
+home();
+</script></body></html>
